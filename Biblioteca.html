@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acervo de Livros - IECE-RS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20230426/pngtree-an-old-library-or-book-room-with-some-books-and-plants-image_2521166.jpg');
+            background-size: cover;
+            background-position: center;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s;
+        }
+
+        /* Modo escuro */
+        .dark-theme {
+            background-color: #1b2a35;
+        }
+
+        header {
+            background-color: rgba(241, 196, 15, 0.8);
+            color: #fff;
+            text-align: center;
+            padding: 30px;
+            font-size: 2.5rem;
+        }
+
+        header img {
+            width: 200px;
+            margin-bottom: 10px;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Cartões dos livros */
+        .livro-card {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 4px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            margin: 15px;
+            overflow: hidden;
+            text-align: center;
+            flex: 1 0 21%;
+            margin-bottom: 30px;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative;
+            width: 200px; /* Fixando o tamanho do cartão */
+        }
+
+        /* Garantir que as imagens dos livros tenham o mesmo tamanho fixo (185x320) */
+        .livro-card img {
+            width: 185px;
+            height: 320px;
+            object-fit: cover;
+        }
+
+        .livro-card h3 {
+            font-size: 1.2rem;
+            color: #f1c40f;
+            margin: 10px;
+        }
+
+        .livro-card p {
+            font-size: 0.9rem;
+            color: #333;
+            padding: 0 10px;
+            margin-bottom: 10px;
+        }
+
+        .livro-card .category {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 10px 20px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .pagination button:hover {
+            background-color: #f1c40f;
+            color: white;
+        }
+
+        .search-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-bar input,
+        .search-bar select {
+            padding: 10px;
+            font-size: 1rem;
+            width: 100%;
+            max-width: 300px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        .search-bar select {
+            width: auto;
+            margin-left: 10px;
+        }
+
+        /* Botão de Doar */
+        .donate-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #27ae60;
+            color: white;
+            padding: 12px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+            z-index: 999;
+        }
+
+        .donate-btn:hover {
+            background-color: #2ecc71;
+        }
+
+        /* Modal para Doação */
+        .donate-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .donate-modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .donate-modal-content button {
+            background-color: #2980b9;
+            font-size: 1rem;
+            padding: 12px 25px;
+            border-radius: 10px;
+        }
+
+        .donate-modal-content button:nth-child(1) {
+            background-color: #2ecc71;
+        }
+
+        .donate-modal-content button:nth-child(1):hover {
+            background-color: #27ae60;
+        }
+
+        .donate-modal-content button:nth-child(2) {
+            background-color: #e74c3c;
+        }
+
+        .donate-modal-content button:nth-child(2):hover {
+            background-color: #c0392b;
+        }
+
+        /* Estilo para os livros lado a lado */
+        .livro-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        /* Card de livros ajustado para telas menores */
+        .livro-card {
+            flex: 1 1 48%; /* Para exibir dois cartões lado a lado */
+            margin: 10px;
+            max-width: 185px;
+            height: 380px;
+        }
+
+        /* Ajuste para telas menores */
+        @media (max-width: 768px) {
+            .livro-cards {
+                display: block; /* Um livro abaixo do outro em telas pequenas */
+            }
+
+            .livro-card {
+                margin: 10px auto;
+                max-width: 185px;
+                width: 185px;
+                height: 320px; /* Ajuste para manter a proporção da imagem */
+            }
+        }
+
+        /* Fixar o botão "Voltar para o site" */
+        .back-to-site-btn {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-to-site-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .back-to-site-btn::before {
+            content: "←";
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .back-to-site-btn {
+            z-index: 999;
+        }
+
+        /* Fixar os botões */
+        .theme-toggle-btn,
+        .back-to-site-btn {
+            position: fixed;
+            top: 10px;
+            z-index: 999;
+        }
+
+        .back-to-site-btn {
+            left: 10px;
+        }
+
+        /* Modal para Doação */
+        .donate-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .donate-modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Botão Voltar para o Site -->
+    <a href="https://www.iecers.org.br" class="back-to-site-btn">Voltar para o site</a>
+
+    <!-- Botão Doar Livro -->
+    <button class="donate-btn" onclick="openDonateModal()">💖</button>
+
+    <header>
+        <img src="https://iecers.wordpress.com/wp-content/uploads/2025/01/transparent.png" alt="Logotipo do IECE-RS" />
+        <h1>Acervo de Livros do IECE-RS</h1>
+    </header>
+
+    <div class="container">
+        <!-- Barra de Pesquisa e Filtros -->
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Pesquisar por título..." onkeyup="filterBooks()">
+            <select id="categoryFilter" onchange="filterBooks()">
+                <option value="">Filtrar por categoria</option>
+                <option value="Ficção">Ficção</option>
+                <option value="História">História</option>
+                <option value="Tecnologia">Tecnologia</option>
+                <option value="Psicologia">Psicologia</option>
+                <option value="Filosofia">Filosofia</option>
+                <option value="Culinária">Culinária</option>
+                <option value="Romance">Romance</option>
+                <option value="Música">Música</option>
+            </select>
+        </div>
+
+        <!-- Grid de Livros -->
+        <div class="livro-cards" id="bookGrid"></div>
+
+        <div class="pagination">
+            <button onclick="previousPage()">Página Anterior</button>
+            <button onclick="nextPage()">Próxima Página</button>
+        </div>
+    </div>
+
+    <!-- Modal Doar Livro -->
+    <div id="donateModal" class="donate-modal">
+        <div class="donate-modal-content">
+            <h2>Você deseja doar um livro?</h2>
+            <button onclick="window.location.href='https://www.iecers.org.br/donate'">Doar Livro</button>
+            <button onclick="closeDonateModal()">Fechar</button>
+        </div>
+    </div>
+
+    <script>
+        const books = [
+            { title: "Livro A", category: "Ficção", description: "Descrição do Livro A", img: "https://harpercollins.com.br/cdn/shop/files/9786560051959_55a4f1eb-e9bd-40cb-a30a-9a53819b1705.jpg?v=1721832477" },
+            { title: "Livro B", category: "História", description: "Descrição do Livro B", img: "https://harpercollins.com.br/cdn/shop/files/9786560051959_55a4f1eb-e9bd-40cb-a30a-9a53819b1705.jpg?v=1721832477" },
+            { title: "Livro C", category: "Tecnologia", description: "Descrição do Livro C", img: "https://harpercollins.com.br/cdn/shop/files/9786560051959_55a4f1eb-e9bd-40cb-a30a-9a53819b1705.jpg?v=1721832477" },
+        ];
+
+        let filteredBooks = [...books];
+        const booksPerPage = 6;
+        let currentPage = 1;
+
+        function displayBooks() {
+            const startIndex = (currentPage - 1) * booksPerPage;
+            const endIndex = startIndex + booksPerPage;
+            const booksToDisplay = filteredBooks.slice(startIndex, endIndex);
+            const bookGrid = document.getElementById('bookGrid');
+            bookGrid.innerHTML = '';
+
+            booksToDisplay.forEach(book => {
+                const bookCard = document.createElement('div');
+                bookCard.classList.add('livro-card');
+                bookCard.innerHTML = `
+                    <img src="${book.img}" alt="Capa do Livro">
+                    <h3>${book.title}</h3>
+                    <p>${book.description}</p>
+                    <p class="category">${book.category}</p>
+                `;
+                bookGrid.appendChild(bookCard);
+            });
+        }
+
+        function filterBooks() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+
+            filteredBooks = books.filter(book => {
+                return (
+                    (book.title.toLowerCase().includes(searchInput)) &&
+                    (categoryFilter === '' || book.category === categoryFilter)
+                );
+            });
+
+            currentPage = 1;
+            displayBooks();
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayBooks();
+            }
+        }
+
+        function nextPage() {
+            if (currentPage * booksPerPage < filteredBooks.length) {
+                currentPage++;
+                displayBooks();
+            }
+        }
+
+        function openDonateModal() {
+            document.getElementById('donateModal').style.display = 'flex';
+        }
+
+        function closeDonateModal() {
+            document.getElementById('donateModal').style.display = 'none';
+        }
+
+        displayBooks();
+    </script>
+</body>
+
+</html>
